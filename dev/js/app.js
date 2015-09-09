@@ -12,42 +12,38 @@ var ViewModel = function() {
           center: new google.maps.LatLng(40.8065, -73.9619),
           zoom: 15,
           mapTypeId: google.maps.MapTypeId.ROADMAP
-      };
+        };
 
-      self.map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-  };
+        self.map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+    };
 
-  self.addMarker = function(address, title) {
-    var geocoder = new google.maps.Geocoder();
+    self.addMarker = function(address, title, typeData) {
+        var geocoder = new google.maps.Geocoder();
 
-    if (geocoder) {
-        geocoder.geocode({'address': address}, function(results, status) {
-            if (status == google.maps.GeocoderStatus.OK) {
-                if (status != google.maps.GeocoderStatus.ZERO_RESULTS) {
+        if (geocoder) {
+            geocoder.geocode({'address': address}, function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    if (status != google.maps.GeocoderStatus.ZERO_RESULTS) {
                     // initialize the HTML that'll be in the info window
-                    var infoWindowContentString = '<b>'+title+'</b><hr>';
+                    var infoWindowHTML = '<b>'+title+'</b><hr>';
 
-                    // get an image of the street view from Google Streetview
-                    var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=200x100&location=' + address + '';
-                    var streetViewImage = '<img src="' + streetviewUrl + '">';
-                    infoWindowContentString += streetViewImage;
+                    infoWindowHTML += appendStreetViewImage(address);
 
-                    // get the Yelp rating
-                    var yelpURL = 'http://api.yelp.com/v2/search?location=' +
-                        address;
-                    $.getJSON(yelpURL, function(data){
-                        console.log(data);
-                    }).error(function(e){
-                        console.log("Yelp data could not be fetched for location");
-                    });
+                    if (typeData.foursquare) {
+                        infoWindowHTML += appendFoursquareReviews(address, title);
+                        console.log(infoWindowHTML);
+                    }
 
-
+                    if (typeData.wikipedia) {
+                        infoWindowHTML += appendWikipediaLinks(title);
+                    }
+                    
 
                     // create the infowindow object
                     var infowindow = new google.maps.InfoWindow(
-                        { content: infoWindowContentString,
-                        size: new google.maps.Size(150,50)
-                    });
+                        { content: infoWindowHTML,
+                            size: new google.maps.Size(150,50)
+                        });
 
                     console.log(results);
                     console.log(title);
@@ -71,18 +67,102 @@ var ViewModel = function() {
                 console.log("Geocoder failed");
             }
         });
-    }
+    };
 
+    self.searchSubmitted = function() {
+        self.initializeMap();
+        console.log("Query term = " + self.currentQueryString());
+    }; 
 };
 
-self.searchSubmitted = function() {
-    self.initializeMap();
-    console.log("Query term = " + self.currentQueryString());
+// returns the HTML that shows the street view image 
+function appendStreetViewImage(coordinates) {
+    // get an image of the street view from Google Streetview
+    var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=200x100&location=' + coordinates + '';
+    var streetViewImage = '<img src="' + streetviewUrl + '">';
 
-}; 
+    return streetViewImage;
+}
+
+// returns the HTML that lists taglines from first 3 foursquare reviews
+function appendFoursquareReviews(coordinates, title) {
+    var foursquareHTML = '<div class="foursquare-container">';
+    var foursquareURL = 'https://api.foursquare.com/v2/venues/search' +
+        '?client_id=1XAJWYDT4R1BMLBJWSMY3S4BMBH2WFH5L5SF3AIR3GQHT2GY' +
+        '&client_secret=P2SKFTK5ZUAUW5GXR1ZBW5EX5GBC3P4TMJLBIPLU1EMLS3IK' +
+        '&v=20140701' +
+        '&near=New York,NY' + 
+        '&ll=' + coordinates +
+        '&query=' + title;
+
+    $.ajax(foursquareURL, {
+        dataType: "json",
+        success: function(data) {
+            var venue = data.response.venues[0];
+            var phone = venue.contact.formattedPhone;
+            foursquareHTML += '<h3>Phone: ' + phone + '</h3>';
+            var venueID = venue.id;
+
+            var tipsURL = 'https://api.foursquare.com/v2/venues/' +
+                venueID + '/tips' +
+                '?client_id=1XAJWYDT4R1BMLBJWSMY3S4BMBH2WFH5L5SF3AIR3GQHT2GY' +
+                '&client_secret=P2SKFTK5ZUAUW5GXR1ZBW5EX5GBC3P4TMJLBIPLU1EMLS3IK' +
+                '&v=20140701' +
+                '&limit=3' +
+                '&sort=popular';
+
+            $.ajax(tipsURL, {
+                dataType: "json",
+                success: function(tipsData) {
+                    foursquareHTML += '<ul class="foursquare-tips-list">';
+                    var tips = tipsData.response.tips.items;
+                    for (var i = 0; i < tips.length; i++) {
+                        foursquareHTML += '<li class="foursquare-tip">' +
+                            tips[i].text + '</li>';
+                    }
+                }
+            });
+        }
+    });
+
+    console.log(foursquareHTML);
+    return foursquareHTML;
+}
+
+// returns the top 3 Wikipedia links related to this place
+function appendWikipediaLinks(title) {
+    var wikiHTML = '<ul>';
+    var wikipediaUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + title + '&format=json&callback=wikiCallback';
+    $.ajax(wikipediaUrl, {
+        dataType: "jsonp",
+        success: function(data) {
+            console.log("Ajax request succeeded!");
+            for (var i = 0; i < data[1].length; i++) {
+                var pageTitle = data[1][i];
+                var pageURL = data[2][i]
+
+                console.log(wikiHTML);
+
+                wikiHTML += '<li>' + 
+                    '<a href="' + pageURL +'">' + pageTitle + '</a></li>';
+            }
+        }
+    });
+
+    wikiHTML = '</ul>';
+
+    return wikiHTML;
+}
+
 
 self.initializeMap();
-self.addMarker('2897 Broadway, New York, NY 10025', 'Nussbaum and Wu');
+self.addMarker(
+    '40.806129,-73.965654', 
+    'Nussbaum and Wu',
+    {
+        foursquare: true,
+        wikipedia: false
+    });
 };
 
 

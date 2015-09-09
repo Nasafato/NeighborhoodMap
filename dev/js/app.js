@@ -24,17 +24,38 @@ var ViewModel = function() {
         geocoder.geocode({'address': address}, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
                 if (status != google.maps.GeocoderStatus.ZERO_RESULTS) {
+                    // initialize the HTML that'll be in the info window
+                    var infoWindowContentString = '<b>'+title+'</b><hr>';
 
+                    // get an image of the street view from Google Streetview
+                    var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=200x100&location=' + address + '';
+                    var streetViewImage = '<img src="' + streetviewUrl + '">';
+                    infoWindowContentString += streetViewImage;
+
+                    // get the Yelp rating
+                    var yelpURL = 'http://api.yelp.com/v2/search?location=' +
+                        address;
+                    $.getJSON(yelpURL, function(data){
+                        console.log(data);
+                    }).error(function(e){
+                        console.log("Yelp data could not be fetched for location");
+                    });
+
+
+
+                    // create the infowindow object
                     var infowindow = new google.maps.InfoWindow(
-                        { content: '<b>'+address+'</b>',
+                        { content: infoWindowContentString,
                         size: new google.maps.Size(150,50)
                     });
+
                     console.log(results);
+                    console.log(title);
 
                     var marker = new google.maps.Marker({
                         position: results[0].geometry.location,
                         map: self.map, 
-                        title:address
+                        title: title
                     }); 
 
                     google.maps.event.addListener(marker, 'click', function() {
@@ -83,6 +104,7 @@ var Map = function(data) {
 };
 
 ko.applyBindings(new ViewModel());
+
 
 
 

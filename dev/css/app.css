@@ -26,7 +26,6 @@
 }
 
 
-
 .fullWidth {
    width: 100%;
    margin-left: auto;
@@ -36,4 +35,8 @@
 
 .row.fullWidth div {
     padding: 0;
+}
+
+.streetview_img {
+    max-width: 200px;
 }

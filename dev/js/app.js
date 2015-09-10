@@ -30,8 +30,9 @@ var ViewModel = function() {
                     infoWindowHTML += appendStreetViewImage(address);
 
                     if (typeData.foursquare) {
-                        infoWindowHTML += appendFoursquareReviews(address, title);
-                        console.log(infoWindowHTML);
+                        var foursquareHTML = appendFoursquareReviews(address, title);
+                        console.log(foursquareHTML);
+                        infoWindowHTML += foursquareHTML;
                     }
 
                     if (typeData.wikipedia) {
@@ -45,8 +46,6 @@ var ViewModel = function() {
                             size: new google.maps.Size(150,50)
                         });
 
-                    console.log(results);
-                    console.log(title);
 
                     var marker = new google.maps.Marker({
                         position: results[0].geometry.location,
@@ -98,6 +97,7 @@ function appendFoursquareReviews(coordinates, title) {
     $.ajax(foursquareURL, {
         dataType: "json",
         success: function(data) {
+            console.log("Foursquare Venue found!");
             var venue = data.response.venues[0];
             var phone = venue.contact.formattedPhone;
             foursquareHTML += '<h3>Phone: ' + phone + '</h3>';
@@ -114,19 +114,20 @@ function appendFoursquareReviews(coordinates, title) {
             $.ajax(tipsURL, {
                 dataType: "json",
                 success: function(tipsData) {
+                    console.log("Foursquare Venue tips returned!");
                     foursquareHTML += '<ul class="foursquare-tips-list">';
                     var tips = tipsData.response.tips.items;
                     for (var i = 0; i < tips.length; i++) {
                         foursquareHTML += '<li class="foursquare-tip">' +
                             tips[i].text + '</li>';
                     }
+
+                    return foursquareHTML;
                 }
             });
         }
     });
 
-    console.log(foursquareHTML);
-    return foursquareHTML;
 }
 
 // returns the top 3 Wikipedia links related to this place
@@ -136,22 +137,20 @@ function appendWikipediaLinks(title) {
     $.ajax(wikipediaUrl, {
         dataType: "jsonp",
         success: function(data) {
-            console.log("Ajax request succeeded!");
             for (var i = 0; i < data[1].length; i++) {
                 var pageTitle = data[1][i];
                 var pageURL = data[2][i]
 
-                console.log(wikiHTML);
-
                 wikiHTML += '<li>' + 
                     '<a href="' + pageURL +'">' + pageTitle + '</a></li>';
             }
+
+            wikiHTML += '</ul>';
+            return wikiHTML;
         }
     });
 
-    wikiHTML = '</ul>';
-
-    return wikiHTML;
+    
 }
 
 

@@ -1,11 +1,55 @@
+var locations = [
+    {
+        coordinates: '40.806129,-73.965654', 
+        title: 'Nussbaum and Wu',
+        dataType: {
+            foursquare: true,
+            wikipedia: false
+        }
+    },
+    {
+        coordinates: '40.802511,-73.967441',
+        title: 'Absolute Bagels',
+        dataType: {
+            foursquare: true,
+            wikipedia: false
+        }
+    },
+    {
+        coordinates: '40.805429, -73.966140',
+        title: 'Columbia Daily Spectator',
+        dataType: {
+            foursquare: false,
+            wikipedia: true
+        }
+    },
+    {
+        coordinates: '40.807721, -73.964111',
+        title: '116 Street-Columbia Metro Station',
+        dataType: {
+            foursquare: true,
+            wikipedia: true
+        }
+    },
+    {
+        coordinates: '40.804479, -73.966849',
+        title: 'Chipotle Mexican Grill',
+        dataType: {
+            foursquare: true,
+            wikipedia: true
+        }
+    }
+];
+
+
 var ViewModel = function() {
     var self = this;
 
     self.map = ko.observable(new Map({}));
-    self.markers = ko.observable([]);
+    self.
 
     self.currentQueryString = ko.observable("");
-    self.googleMapsAPIKey = ko.observable("AIzaSyBG0EBRBgIL3eq6mulH_zfKAXkMYN8o_4U");
+    self.googleMapsAPIKey = "AIzaSyBG0EBRBgIL3eq6mulH_zfKAXkMYN8o_4U";
 
     self.initializeMap = function() {
         var mapProp = {
@@ -17,6 +61,23 @@ var ViewModel = function() {
         self.map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
     };
 
+    self.search = function() {
+
+    };
+
+
+};
+
+var Model = function() {
+    var self = this;
+
+    self.markers = ko.observable([]);
+
+    self.addMarker = function(location) {
+
+    };
+}
+/*
     self.addMarker = function(address, title, typeData) {
         var geocoder = new google.maps.Geocoder();
 
@@ -149,12 +210,12 @@ function appendWikipediaLinks(title) {
             return wikiHTML;
         }
     });
-
-    
 }
 
+*/
 
 self.initializeMap();
+/*
 self.addMarker(
     '40.806129,-73.965654', 
     'Nussbaum and Wu',
@@ -163,24 +224,8 @@ self.addMarker(
         wikipedia: false
     });
 };
+*/
 
-
-// object that holds map data
-// queryString: the original search string the user input
-// imageURL: the address of the image that will be displayed as the map
-var Map = function(data) {
-    var self = this;
-    self.queryString = ko.observable(data.queryString);
-    self.imageURL = ko.observable(data.imgSRC);
-    self.markers = ko.observableArray([]);
-
-    self.setImage = function(imageURL) {
-        self.imageURL = imageURL;
-    };
-
-    self.addMarker = function(position, title) {
-    }
-};
 
 ko.applyBindings(new ViewModel());
 

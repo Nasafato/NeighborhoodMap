@@ -1,56 +1,70 @@
-var locations = [
-    {
-        coordinates: '40.806129,-73.965654', 
-        title: 'Nussbaum and Wu',
-        dataType: {
-            foursquare: true,
-            wikipedia: false
-        }
-    },
-    {
-        coordinates: '40.802511,-73.967441',
-        title: 'Absolute Bagels',
-        dataType: {
-            foursquare: true,
-            wikipedia: false
-        }
-    },
-    {
-        coordinates: '40.805429, -73.966140',
-        title: 'Columbia Daily Spectator',
-        dataType: {
-            foursquare: false,
-            wikipedia: true
-        }
-    },
-    {
-        coordinates: '40.807721, -73.964111',
-        title: '116 Street-Columbia Metro Station',
-        dataType: {
-            foursquare: true,
-            wikipedia: true
-        }
-    },
-    {
-        coordinates: '40.804479, -73.966849',
-        title: 'Chipotle Mexican Grill',
-        dataType: {
-            foursquare: true,
-            wikipedia: true
-        }
-    }
-];
-
+// class that contains all the info related to a location
+var Location = function(data) {
+    var self = this;
+    self.coordinates = data.coordinates;
+    self.title = data.title;
+    self.dataType = data.dataType;
+    self.visible = ko.observable(true);
+};
 
 var ViewModel = function() {
     var self = this;
 
-    self.map = ko.observable(new Map({}));
-    self.
+    self.locations = [
+        new Location({
+            coordinates: '40.806129,-73.965654', 
+            title: 'Nussbaum and Wu',
+            dataType: {
+                foursquare: true,
+                wikipedia: false
+            },
+            visible: true
+        }),
+        new Location({
+            coordinates: '40.802511,-73.967441',
+            title: 'Absolute Bagels',
+            dataType: {
+                foursquare: true,
+                wikipedia: false
+            },
+            visible: true
+        }),
+        new Location({
+            coordinates: '40.805429,-73.966140',
+            title: 'Columbia Daily Spectator',
+            dataType: {
+                foursquare: false,
+                wikipedia: true
+            },
+            visible: true
+        }),
+        new Location({
+            coordinates: '40.807721,-73.964111',
+            title: '116 Street-Columbia Metro Station',
+            dataType: {
+                foursquare: true,
+                wikipedia: true
+            },
+            visible: true
+        }),
+        new Location({
+            coordinates: '40.804479,-73.966849',
+            title: 'Chipotle Mexican Grill',
+            dataType: {
+                foursquare: true,
+                wikipedia: true
+            },
+            visible: true
+        })
 
-    self.currentQueryString = ko.observable("");
+    ];
+
+    self.markers = [];
+    self.currentQuery = ko.observable("");
     self.googleMapsAPIKey = "AIzaSyBG0EBRBgIL3eq6mulH_zfKAXkMYN8o_4U";
+    self.map = {};
 
+    // initializes the Google map
     self.initializeMap = function() {
         var mapProp = {
           center: new google.maps.LatLng(40.8065, -73.9619),
@@ -61,22 +75,74 @@ var ViewModel = function() {
         self.map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
     };
 
-    self.search = function() {
+    // populates the map with markers and their info windows
+    self.initializeMarkers = function() {
+        for (var i = 0; i < self.locations.length; i++) {
+            var location = self.locations[i];
 
+            // converts the string coordinates to a latLng object
+            latLng = {
+                lat: parseFloat(location.coordinates.split(',')[0]),
+                lng: parseFloat(location.coordinates.split(',')[1])
+            };  
+
+            // create the infoWindowHTML and add the street view image
+            var infoWindowHTML = '<b>'+ location.title +'</b><hr>';
+            infoWindowHTML += appendStreetViewImage(location.coordinates);
+
+            // initialize the marker
+            var marker = new google.maps.Marker({
+                position: latLng,
+                map: self.map,
+                title: location.title,
+                info: infoWindowHTML
+            });
+
+            // create the infoWindow object
+            var infoWindow = new google.maps.InfoWindow({
+                content: infoWindowHTML,
+                size: new google.maps.Size(150,50)
+            });
+            
+            // add the click event to show the infoWindow
+            google.maps.event.addListener(marker, 'click', function() {
+                infoWindow.setContent(this.info);
+                infoWindow.open(self.map, this);
+            });
+
+            self.markers.push(marker);
+        } 
+    }
+
+    // filters markers and location list whenever a new query is submitted
+    self.searchSubmitted = function() {
+        for (var i = 0; i < self.locations.length; i++) {
+            if (self.locations[i].title.indexOf(self.currentQuery()) > -1) {
+                self.locations[i].visible(true);
+                self.markers[i].setMap(self.map);
+            } else {
+                self.locations[i].visible(false);
+                self.markers[i].setMap(null);
+            }
+        }
     };
 
+    self.initializeMap();
+    self.initializeMarkers();
+    self.searchSubmitted();
 
+    // returns the HTML that shows the street view image 
+    function appendStreetViewImage(coordinates) {
+        // get an image of the street view from Google Streetview
+        var streetViewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=200x100&location=' + coordinates + '';
+        var streetViewImage = '<img src="' + streetViewUrl + '">';
+
+        return streetViewImage;
+    }
 };
 
-var Model = function() {
-    var self = this;
 
-    self.markers = ko.observable([]);
-
-    self.addMarker = function(location) {
-
-    };
-}
+ko.applyBindings(new ViewModel());
 /*
     self.addMarker = function(address, title, typeData) {
         var geocoder = new google.maps.Geocoder();
@@ -135,14 +201,7 @@ var Model = function() {
     }; 
 };
 
-// returns the HTML that shows the street view image 
-function appendStreetViewImage(coordinates) {
-    // get an image of the street view from Google Streetview
-    var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=200x100&location=' + coordinates + '';
-    var streetViewImage = '<img src="' + streetviewUrl + '">';
 
-    return streetViewImage;
-}
 
 // returns the HTML that lists taglines from first 3 foursquare reviews
 function appendFoursquareReviews(coordinates, title) {
@@ -214,7 +273,7 @@ function appendWikipediaLinks(title) {
 
 */
 
-self.initializeMap();
+
 /*
 self.addMarker(
     '40.806129,-73.965654', 
@@ -227,7 +286,7 @@ self.addMarker(
 */
 
 
-ko.applyBindings(new ViewModel());
+
 
 
 

@@ -1,3 +1,36 @@
+var WikiLinks = function(query) {
+    var self = this;
+
+    self.query = query;
+    self.links = ko.observableArray();
+
+    self.getLinks = ko.computed(function() {
+
+        var dt = 'jsonp';
+        var wikiBase = 'http://en.wikipedia.org/w/api.php';
+        var wikiUrl = wikiBase + '?action=opensearch&search=' + self.query + 
+            '&format=json&callback=wikiCallback';
+    
+        $.ajax({
+                url: wikiUrl,
+                dataType: dt,
+                success: function(response){
+                    var titleList = response[1];
+
+                    for (var i = 0; i < titleList.length; i++) {
+                        var titleStr = titleList[i],
+                            urlStr = 'http://en.wikipedia.org/wiki/' + titleStr;
+                        self.links.push({url: urlStr, title: titleStr});
+                    };
+                    console.log(self.links());
+            }
+        });
+    });
+
+    self.getLinks();
+};
+
+
 // class that contains all the info related to a location
 var Location = function(data) {
     var self = this;
@@ -5,6 +38,8 @@ var Location = function(data) {
     self.title = data.title;
     self.dataType = data.dataType;
     self.visible = ko.observable(true);
+    self.wikiLinks = new WikiLinks(self.title);
+    self.infoWindowHTML = '';
 };
 
 var ViewModel = function() {
@@ -59,6 +94,10 @@ var ViewModel = function() {
 
     ];
 
+    self.infoWindow = new google.maps.InfoWindow({
+                content: '',
+                size: new google.maps.Size(150,50)
+            });
     self.markers = [];
     self.currentQuery = ko.observable("");
     self.googleMapsAPIKey = "AIzaSyBG0EBRBgIL3eq6mulH_zfKAXkMYN8o_4U";
@@ -87,7 +126,7 @@ var ViewModel = function() {
             };  
 
             // create the infoWindowHTML and add the street view image
-            var infoWindowHTML = '<b>'+ location.title +'</b><hr>';
+            self.locations[i].infoWindowHTML = infoWindowHTML = '<b>'+ location.title +'</b><hr>';
             infoWindowHTML += appendStreetViewImage(location.coordinates);
 
             // initialize the marker
@@ -98,16 +137,11 @@ var ViewModel = function() {
                 info: infoWindowHTML
             });
 
-            // create the infoWindow object
-            var infoWindow = new google.maps.InfoWindow({
-                content: infoWindowHTML,
-                size: new google.maps.Size(150,50)
-            });
             
             // add the click event to show the infoWindow
             google.maps.event.addListener(marker, 'click', function() {
-                infoWindow.setContent(this.info);
-                infoWindow.open(self.map, this);
+                self.infoWindow.setContent(this.info);
+                self.infoWindow.open(self.map, this);
             });
 
             self.markers.push(marker);
@@ -139,10 +173,22 @@ var ViewModel = function() {
 
         return streetViewImage;
     }
+
+    // get wikipedia links
+    function appendWikipediaLinks(markerIndex) {
+        var wikiHTML = '<ul data-bind="foreach: locations>'; 
+        wikiHTML += '<li data-bind="text: title"></li>';
+        wikiHTML += '</ul>';
+        //wikiHTML += '<li><a data-bind="attr: {href: url, title: title}">Link</a></li>';
+
+        return wikiHTML;
+    }
 };
 
 
 ko.applyBindings(new ViewModel());
+
+
 /*
     self.addMarker = function(address, title, typeData) {
         var geocoder = new google.maps.Geocoder();

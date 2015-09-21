@@ -98,6 +98,7 @@ var ViewModel = function() {
                 content: '',
                 size: new google.maps.Size(150,50)
             });
+    self.currentLocation = ko.observable();
     self.markers = [];
     self.currentQuery = ko.observable("");
     self.googleMapsAPIKey = "AIzaSyBG0EBRBgIL3eq6mulH_zfKAXkMYN8o_4U";
@@ -126,25 +127,24 @@ var ViewModel = function() {
             };  
 
             // create the infoWindowHTML and add the street view image
-            self.locations[i].infoWindowHTML = infoWindowHTML = '<b>'+ location.title +'</b><hr>';
-            infoWindowHTML += appendStreetViewImage(location.coordinates);
+            self.locations[i].infoWindowHTML = '<b>'+ location.title +'</b><hr>';
+            self.locations[i].infoWindowHTML += appendStreetViewImage(location.coordinates);
 
             // initialize the marker
             var marker = new google.maps.Marker({
                 position: latLng,
                 map: self.map,
                 title: location.title,
-                info: infoWindowHTML
-            });
-
-            
-            // add the click event to show the infoWindow
-            google.maps.event.addListener(marker, 'click', function() {
-                self.infoWindow.setContent(this.info);
-                self.infoWindow.open(self.map, this);
+                info: self.locations[i].infoWindowHTML
             });
 
             self.markers.push(marker);
+            
+            // add the click event to show the infoWindow
+            google.maps.event.addListener(self.markers[i], 'click', function() {
+                self.infoWindow.setContent(this.info);
+                self.infoWindow.open(self.map, this);
+            });
         } 
     }
 

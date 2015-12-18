@@ -98,9 +98,9 @@ var ViewModel = function() {
                 content: '',
                 size: new google.maps.Size(150,50)
             });
-    self.currentLocation = ko.observable();
+    self.currentLocation = ko.observable(self.locations[0]);
     self.markers = [];
-    self.currentQuery = ko.observable("");
+    self.currentQuery = ko.observable();
     self.googleMapsAPIKey = "AIzaSyBG0EBRBgIL3eq6mulH_zfKAXkMYN8o_4U";
     self.map = {};
 
@@ -172,16 +172,6 @@ var ViewModel = function() {
         var streetViewImage = '<img src="' + streetViewUrl + '">';
 
         return streetViewImage;
-    }
-
-    // get wikipedia links
-    function appendWikipediaLinks(markerIndex) {
-        var wikiHTML = '<ul data-bind="foreach: locations>'; 
-        wikiHTML += '<li data-bind="text: title"></li>';
-        wikiHTML += '</ul>';
-        //wikiHTML += '<li><a data-bind="attr: {href: url, title: title}">Link</a></li>';
-
-        return wikiHTML;
     }
 };
 

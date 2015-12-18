@@ -1,8 +1,26 @@
 {
-  "name": "NeighborhoodMapProject",
+  "name": "NeighborhoodMap",
   "version": "1.0.0",
-  "description": "Lets you place markers around the neighboorhood and filter them by name. Allows you to search for filters as well.",
+  "description": "",
   "main": "index.js",
+  "dependencies": {
+    "gulp": "^3.9.0"
+  },
+  "devDependencies": {
+    "browserify": "^12.0.1",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-html-replace": "^1.5.5",
+    "gulp-jshint": "^2.0.0",
+    "gulp-minify-css": "^1.2.2",
+    "gulp-streamify": "^1.0.2",
+    "gulp-uglify": "^1.5.1",
+    "jshint": "^2.8.0",
+    "reactify": "^1.1.1",
+    "streamify": "^0.2.5",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.6.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,26 +28,10 @@
     "type": "git",
     "url": "https://github.com/Nasafato/NeighborhoodMap.git"
   },
-  "author": "Alan Gou",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Nasafato/NeighborhoodMap/issues"
   },
-  "homepage": "https://github.com/Nasafato/NeighborhoodMap",
-  "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-clean": "^0.6.0",
-    "grunt-contrib-copy": "^0.8.0",
-    "grunt-contrib-cssmin": "^0.13.0",
-    "grunt-contrib-htmlmin": "^0.4.0",
-    "grunt-contrib-jshint": "^0.11.2",
-    "grunt-contrib-nodeunit": "^0.4.1",
-    "grunt-contrib-uglify": "^0.9.1",
-    "grunt-mkdir": "^0.1.2",
-    "grunt-ngrok": "^0.2.2",
-    "grunt-pagespeed": "^1.0.0",
-    "grunt-responsive-images": "^0.1.6",
-    "load-grunt-tasks": "^3.2.0",
-    "ngrok": "^0.1.99"
-  }
+  "homepage": "https://github.com/Nasafato/NeighborhoodMap"
 }

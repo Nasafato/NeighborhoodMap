@@ -1,0 +1,44 @@
+body {
+	margin: 0;
+	padding: 0;
+	background: yellow;
+}
+
+html, body, .page-wrapper {
+	height: 100%;
+}
+
+.sidebar-wrapper, .content-wrapper {
+	height: 100%;
+	float: left;
+}
+
+.sidebar-wrapper {
+	background-color: red;
+	width: 20%;
+}
+
+.sidebar-header {
+	height: 40px;
+	background: purple;
+}
+
+.sidebar-content {
+	height: calc(100% - 40px);
+	background: orange;
+}
+
+.content-wrapper {
+	background-color: blue;
+	width: 80%;
+}
+
+.content-header {
+	height: 40px;
+	background: green;
+}
+
+.content {
+	height: calc(100% - 40px);
+	background: teal;
+}

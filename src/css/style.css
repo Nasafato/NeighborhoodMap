@@ -8,6 +8,9 @@ html, body, .page-wrapper {
 	height: 100%;
 }
 
+.page-wrapper {
+}
+
 .sidebar-wrapper, .content-wrapper {
 	height: 100%;
 	float: left;
@@ -15,7 +18,8 @@ html, body, .page-wrapper {
 
 .sidebar-wrapper {
 	background-color: red;
-	width: 20%;
+	z-index: 999;
+	display: none;
 }
 
 .sidebar-header {
@@ -30,7 +34,7 @@ html, body, .page-wrapper {
 
 .content-wrapper {
 	background-color: blue;
-	width: 80%;
+	width: 100%;
 }
 
 .content-header {
@@ -42,3 +46,91 @@ html, body, .page-wrapper {
 	height: calc(100% - 40px);
 	background: teal;
 }
+
+.sidebar-menu-icon {
+	margin-left: 10px;
+}
+
+.sidebar-menu-icon span {
+	cursor: pointer;
+}
+
+.sidebar-menu-icon span:hover {
+	color: gray;
+}
+
+.sidebar-menu-icon span:active {
+	color: white;
+}
+
+.search-container {
+	margin-right: 10px;
+}
+
+.search-field {
+	border-radius: 10px;
+	padding:5px 15px;
+    background:rgba(50, 50, 50, 0.2);
+    border:0px solid #dbdbdb;
+}
+
+.search-field-button {
+	cursor: pointer;
+	border-radius: 10px;
+	position:relative;
+    padding:5px 15px;
+    border:0px solid #207cca;
+    background-color:#207cca;
+    color:#fafafa;
+}
+
+.search-field-button:hover {
+	background-color: #106bb9;
+	color: gray;
+}
+
+.vertical-align {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+#hamburger-icon-sidebar {
+	display: none;
+}
+
+.pull-right {
+	float: right;
+}
+
+@media (min-width: 800px) {
+	.content-wrapper {
+		width: 80%;
+	}
+
+	.sidebar-menu-icon {
+		display: none;
+	}
+
+
+	.sidebar-wrapper {
+		width: 20%;
+		display: block;
+	}
+}
+
+@media (min-width: 1024px) {
+	.title {
+		font-size: 20px;
+	}
+}
+
+
+/* content */
+
+#map {
+	height: 100%;
+}
+
+
+

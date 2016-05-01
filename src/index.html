@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Neighborhood Map</title>
+  <meta name="description" content="Neighborhood Map using KnockJS">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+ <!-- Latest compiled and minified CSS -->
+
+ 
+
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
+</head>
+
+<body>
+  <div class="page-wrapper">
+    <div id="sidebar-wrapper" class="sidebar-wrapper">
+      <div class="sidebar-header">
+        <div class="vertical-align title">
+          <div class="sidebar-menu-icon" onclick="toggleSidebar()">
+            <span id="hamburger-icon-sidebar"><i class="fa fa-bars" aria-hidden="true"></i></span>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-content">
+      </div>
+
+    </div>
+    <div id="content-wrapper" class="content-wrapper">
+      <div class="content-header">
+        <div class="pull-left sidebar-menu-icon vertical-align" onclick="toggleSidebar()">
+          <span id="hamburger-icon-content"><i class="fa fa-bars" aria-hidden="true"></i></span>
+        </div>
+        <div class="vertical-align pull-right search-container">
+          <form>
+            <input class="search-field" placeholder="search for..." type="text" />
+            <button class="search-field-button" type="submit">
+            Search
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="content">
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="js/app.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBG0EBRBgIL3eq6mulH_zfKAXkMYN8o_4U&callback=initMap"
+    async defer></script>
+</body>
+</html>

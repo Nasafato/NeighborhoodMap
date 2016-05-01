@@ -37,6 +37,14 @@
         <div class="pull-left sidebar-menu-icon vertical-align" onclick="toggleSidebar()">
           <span id="hamburger-icon-content"><i class="fa fa-bars" aria-hidden="true"></i></span>
         </div>
+        <div class="pull-left vertical-align">
+          <button class="search-field-button" type="button" data-bind="click: toggleOn">
+          On
+          </button>
+          <button class="search-field-button" type="button" data-bind="click: toggleOff">
+          Off
+          </button>
+        </div>
         <div class="vertical-align pull-right search-container">
           <form>
             <input class="search-field" placeholder="search for..." type="text" />

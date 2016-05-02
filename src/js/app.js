@@ -1,35 +1,121 @@
 "use strict"
 
 var toggled = false;
+var modelSelf;
+var map;
 
-console.log(window.innerWidth);
-
-var Location = function(lat, long) {
+var Location = function(lat, long, title) {
 	var self = this;
 
-	this.lat = lat;
-	this.long = long;
+	this.title = title;
 	this.isVisible = ko.observable(true);
+	this.createMarker = function() {
+		var latLong = new google.maps.LatLng(lat, long);
+		var newMarker = new google.maps.Marker({
+			position: latLong,
+			title: title
+		});
+
+		return newMarker;
+	};
+
+	this.createInfoWindow = function(marker) {
+		var infoWindowHTML = '<b>'+title+'</b><hr>';
+		var infoWindow = new google.maps.InfoWindow({
+		 	content: infoWindowHTML,
+            size: new google.maps.Size(150,50)
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+        	self.showInfoWindow();
+        });
+
+        return infoWindow;
+	}
+
+	this.marker = this.createMarker(lat, long, title);
+	this.infoWindow = this.createInfoWindow(this.marker)
+	this.marker.setMap(map);
+
+	this.turnOffInfoWindow = function() {
+		this.infoWindow.close();
+	};
+
+	this.showInfoWindow = function() {
+		modelSelf.toggleOffInfoWindows();
+		self.infoWindow.open(map, self.marker);
+	}
 
 	this.turnOff = function() {
 		this.isVisible(false);
+		this.marker.setMap(null)
 	};
 
 	this.turnOn = function() {
-		this.isVisible(false);
+		this.isVisible(true);
+		this.marker.setMap(map);
 	};
 
-};
-
-var LocationListModel = function() {
-	this.locations = ko.observableArray([]);
-
-	this.addLocation = function(latitude, longitude) {
-		var newLocation = Location(latitude, longitude);
+	this.filter = function(filterString) {
+		if (~this.title.indexOf(filterString)) {
+			this.turnOn();
+		} else {
+			this.turnOff();
+		}
 	}
 };
 
+var LocationListModel = function() {
+	modelSelf = this;
+	var self = this;
+	this.locations = ko.observableArray([]);
+	this.currentFilter = ko.observable("");
 
+	this.filterLocations = function() {
+		this.locations().forEach(function(location) {
+			location.filter(self.currentFilter());
+		});
+	}
+
+	this.toggleOffInfoWindows = function() {
+		this.locations().forEach(function(location) {
+			location.turnOffInfoWindow();
+		});
+	}
+
+	this.toggleOffMarkers = function() {
+		this.locations().forEach(function(location) {
+			location.turnOff();
+		});
+	}
+
+	this.toggleOnMarkers = function() {
+		this.locations().forEach(function(location) {
+			location.turnOn();
+		});
+	}
+
+	this.addLocation = function(latitude, longitude, title) {
+		var newLocation = Location(latitude, longitude, title);
+		this.locations().push(newLocation);
+	}
+};
+
+function initMap() {
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: {lat: 40.8065, lng: -73.9619},
+		scrollwheel: true,
+		zoom: 16
+	});
+	modelSelf.locations.push(new Location(40.806129, -73.965654, "Nussbaum and Wu"));
+	modelSelf.locations.push(new Location(40.807721, -73.964111, "116th Street - Columbia Metro Station"));
+	modelSelf.locations.push(new Location(40.804479, -73.966849, "Chipotle Mexican Grill"));
+	modelSelf.locations.push(new Location(40.805429, -73.966140, "Columbia Daily Spectator"));
+	modelSelf.locations.push(new Location(40.802511, -73.967441, "Absolute Bagels"));
+}
+
+
+ko.applyBindings(new LocationListModel())
 
 function toggleSidebar() {
 	var sidebar = document.getElementById("sidebar-wrapper");
@@ -40,16 +126,12 @@ function toggleSidebar() {
 	if (toggled) {
 		sidebar.removeAttribute("style");
 		content.removeAttribute("style");
-		/*
-		sidebar.style.width = 0 + "%";
-		sidebar.style.position = "relative";
-		content.style.width = 100 + "%";
-		*/
 		toggled = false;
 	} else {
 		sidebar.style.display = "block";
 		sidebar.style.position = "absolute";
 		sidebar.style.width = 50 + "%"
+
 		content.style.display = "block";
 		content.style.width = 100 + "%";
 
@@ -66,18 +148,4 @@ window.onresize = function() {
 		sidebar.removeAttribute("style");
 		content.removeAttribute("style");
 	}
-
 }
-
-
-function initMap() {
-  // Create a map object and specify the DOM element for display.
-	var map = new google.maps.Map(document.getElementById('map'), {
-		center: {lat: -34.397, lng: 150.644},
-		scrollwheel: true,
-		zoom: 8
-	});
-}
-
-
-

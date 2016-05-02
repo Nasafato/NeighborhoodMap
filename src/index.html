@@ -28,7 +28,10 @@
           </div>
         </div>
       </div>
-      <div class="sidebar-content">
+      <div class="sidebar-content" data-bind="foreach: locations">
+        <div data-bind="visible: isVisible ">
+          <button type="button" data-bind="text: title, click: showInfoWindow"></button>
+        </div>
       </div>
 
     </div>
@@ -37,21 +40,11 @@
         <div class="pull-left sidebar-menu-icon vertical-align" onclick="toggleSidebar()">
           <span id="hamburger-icon-content"><i class="fa fa-bars" aria-hidden="true"></i></span>
         </div>
-        <div class="pull-left vertical-align">
-          <button class="search-field-button" type="button" data-bind="click: toggleOn">
-          On
-          </button>
-          <button class="search-field-button" type="button" data-bind="click: toggleOff">
-          Off
-          </button>
-        </div>
         <div class="vertical-align pull-right search-container">
-          <form>
-            <input class="search-field" placeholder="search for..." type="text" />
-            <button class="search-field-button" type="submit">
-            Search
+            <input class="search-field" placeholder="search for..." type="text" data-bind="value: currentFilter" />
+            <button class="search-field-button" type="button" data-bind="click: filterLocations">
+            Filter
             </button>
-          </form>
         </div>
       </div>
       <div class="content">

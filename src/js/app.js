@@ -1,6 +1,7 @@
 "use strict"
 
 var toggled = false;
+var modelSelf;
 var map;
 
 var Location = function(lat, long, title) {
@@ -14,21 +15,36 @@ var Location = function(lat, long, title) {
 			position: latLong,
 			title: title
 		});
-        var infoWindowHTML = '<b>'+title+'</b><hr>';
+
+		return newMarker;
+	};
+
+	this.createInfoWindow = function(marker) {
+		var infoWindowHTML = '<b>'+title+'</b><hr>';
 		var infoWindow = new google.maps.InfoWindow({
 		 	content: infoWindowHTML,
             size: new google.maps.Size(150,50)
         });
 
-        google.maps.event.addListener(newMarker, 'click', function() {
-        	infoWindow.open(map, newMarker);
+        google.maps.event.addListener(marker, 'click', function() {
+        	self.showInfoWindow();
         });
 
-		return newMarker;
-	};
+        return infoWindow;
+	}
 
 	this.marker = this.createMarker(lat, long, title);
+	this.infoWindow = this.createInfoWindow(this.marker)
 	this.marker.setMap(map);
+
+	this.turnOffInfoWindow = function() {
+		this.infoWindow.close();
+	};
+
+	this.showInfoWindow = function() {
+		modelSelf.toggleOffInfoWindows();
+		self.infoWindow.open(map, self.marker);
+	}
 
 	this.turnOff = function() {
 		this.isVisible(false);
@@ -36,22 +52,44 @@ var Location = function(lat, long, title) {
 	};
 
 	this.turnOn = function() {
-		this.isVisible(false);
+		this.isVisible(true);
 		this.marker.setMap(map);
 	};
+
+	this.filter = function(filterString) {
+		if (~this.title.indexOf(filterString)) {
+			this.turnOn();
+		} else {
+			this.turnOff();
+		}
+	}
 };
 
-var modelSelf;
 var LocationListModel = function() {
 	modelSelf = this;
+	var self = this;
 	this.locations = ko.observableArray([]);
-	this.toggleOff = function() {
+	this.currentFilter = ko.observable("");
+
+	this.filterLocations = function() {
+		this.locations().forEach(function(location) {
+			location.filter(self.currentFilter());
+		});
+	}
+
+	this.toggleOffInfoWindows = function() {
+		this.locations().forEach(function(location) {
+			location.turnOffInfoWindow();
+		});
+	}
+
+	this.toggleOffMarkers = function() {
 		this.locations().forEach(function(location) {
 			location.turnOff();
 		});
 	}
 
-	this.toggleOn = function() {
+	this.toggleOnMarkers = function() {
 		this.locations().forEach(function(location) {
 			location.turnOn();
 		});
@@ -69,7 +107,11 @@ function initMap() {
 		scrollwheel: true,
 		zoom: 16
 	});
-	modelSelf.locations().push(new Location(40.806129, -73.965654, "Nussbaum and Wu"));
+	modelSelf.locations.push(new Location(40.806129, -73.965654, "Nussbaum and Wu"));
+	modelSelf.locations.push(new Location(40.807721, -73.964111, "116th Street - Columbia Metro Station"));
+	modelSelf.locations.push(new Location(40.804479, -73.966849, "Chipotle Mexican Grill"));
+	modelSelf.locations.push(new Location(40.805429, -73.966140, "Columbia Daily Spectator"));
+	modelSelf.locations.push(new Location(40.802511, -73.967441, "Absolute Bagels"));
 }
 
 

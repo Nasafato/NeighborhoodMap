@@ -4,12 +4,44 @@ var toggled = false;
 var modelSelf;
 var map;
 
+var requestWikiLinks = function(query) {
+	var dataType = 'jsonp';
+    var wikiBase = 'http://en.wikipedia.org/w/api.php';
+    var wikiUrl = wikiBase + '?action=opensearch&search=' + query + 
+        '&format=json&callback=wikiCallback';
+     $.ajax({
+            url: wikiUrl,
+            dataType: dataType,
+            success: function(response){
+            	/*
+                var titleList = response[1];
+                var linkList = response[3];
+
+                for (var i = 0; i < titleList.length; i++) {
+                    var titleStr = titleList[i],
+                        urlStr = 'http://en.wikipedia.org/wiki/' + titleStr;
+                    self.links.push({url: urlStr, title: titleStr});
+                }
+                */
+                //console.log(self.links());
+                console.log(response);
+                console.log("Request succeeded!");
+        }
+    });
+}
+
+requestWikiLinks("coffee");
+
+		    
+       
+
 var Location = function(lat, long, title) {
 	var self = this;
 
 	this.title = title;
 	this.isVisible = ko.observable(true);
-	this.createMarker = function() {
+
+	var createMarker = function() {
 		var latLong = new google.maps.LatLng(lat, long);
 		var newMarker = new google.maps.Marker({
 			position: latLong,
@@ -19,7 +51,7 @@ var Location = function(lat, long, title) {
 		return newMarker;
 	};
 
-	this.createInfoWindow = function(marker) {
+	var createInfoWindow = function(marker) {
 		var infoWindowHTML = '<b>'+title+'</b><hr>';
 		var infoWindow = new google.maps.InfoWindow({
 		 	content: infoWindowHTML,
@@ -33,8 +65,8 @@ var Location = function(lat, long, title) {
         return infoWindow;
 	}
 
-	this.marker = this.createMarker(lat, long, title);
-	this.infoWindow = this.createInfoWindow(this.marker)
+	this.marker = createMarker(lat, long, title);
+	this.infoWindow = createInfoWindow(this.marker)
 	this.marker.setMap(map);
 
 	this.turnOffInfoWindow = function() {
@@ -43,7 +75,7 @@ var Location = function(lat, long, title) {
 
 	this.showInfoWindow = function() {
 		modelSelf.toggleOffInfoWindows();
-		self.infoWindow.open(map, self.marker);
+		this.infoWindow.open(map, this.marker);
 	}
 
 	this.turnOff = function() {
@@ -97,7 +129,7 @@ var LocationListModel = function() {
 
 	this.addLocation = function(latitude, longitude, title) {
 		var newLocation = Location(latitude, longitude, title);
-		this.locations().push(newLocation);
+		this.locations.push(newLocation);
 	}
 };
 
